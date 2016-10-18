@@ -90,7 +90,7 @@ public class SlideListView extends ListView {
 		// You can use setOnScrollListener() in your own code
 		setOnScrollListener(mInnerOnScrollListener);
 		// You can use setOnItemClickListener() in your own code
-		setOnItemClickListener(mInnerOnItemClickListener);
+		//setOnItemClickListener(mInnerOnItemClickListener);
 	}
 
 	@Override

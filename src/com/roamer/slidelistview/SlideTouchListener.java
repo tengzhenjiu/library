@@ -37,13 +37,21 @@ public class SlideTouchListener implements OnTouchListener {
 	private VelocityTracker mVelocityTracker;
 	private int mScrollState = SLIDING_STATE_NONE;
 	//
-	private SlideItem mSlideItem;
+	public SlideItem mSlideItem;
 
 	public SlideTouchListener(SlideListView slideListView) {
 		mSlideListView = slideListView;
 		ViewConfiguration configuration = ViewConfiguration.get(slideListView.getContext());
 		mTouchSlop = configuration.getScaledTouchSlop();
-		mConfigShortAnimationTime = slideListView.getContext().getResources().getInteger(android.R.integer.config_shortAnimTime);
+		mConfigShortAnimationTime = slideListView.getContext().getResources()
+				.getInteger(android.R.integer.config_shortAnimTime);
+
+	}
+
+	public void CreatItem(int position) {
+		if (mSlideItem == null) {// start sliding and init mSlideItem
+			mSlideItem = new SlideItem(position);
+		}
 	}
 
 	/**
@@ -110,7 +118,7 @@ public class SlideTouchListener implements OnTouchListener {
 		}
 	}
 
-	private class SlideItem {
+	class SlideItem {
 		/**
 		 * The slideItem's position
 		 */
@@ -123,10 +131,11 @@ public class SlideTouchListener implements OnTouchListener {
 		/**
 		 * represent the offset of slide item(Actual,it is the front view's
 		 * offset).<br/>
-		 * The value must between {@link #minOffset} and {@link #maxOffset}.<br/>
+		 * The value must between {@link #minOffset} and {@link #maxOffset}.
+		 * <br/>
 		 * if the item has no sliding any more,offset==0.
 		 */
-		private int offset;
+		public int offset;
 
 		/**
 		 * if rightBackView!=null && rightBackView.getWidth()!=0,then the
@@ -157,7 +166,8 @@ public class SlideTouchListener implements OnTouchListener {
 
 		public SlideItem(int pos) {
 			position = pos;
-			child = (SlideItemWrapLayout) mSlideListView.getChildAt(position - mSlideListView.getFirstVisiblePosition());
+			child = (SlideItemWrapLayout) mSlideListView
+					.getChildAt(position - mSlideListView.getFirstVisiblePosition());
 			if (child == null) {
 				throw new NullPointerException("At position:" + position
 						+ "child(Item) cann't be null.Are your sure you have use createConvertView() method in your adapter");
@@ -169,7 +179,8 @@ public class SlideTouchListener implements OnTouchListener {
 			}
 			leftBackView = child.getLeftBackView();
 			rightBackView = child.getRightBackView();
-			SlideMode slideMode = mSlideListView.getSlideAdapter().getSlideModeInPosition(position - mSlideListView.getHeaderViewsCount());
+			SlideMode slideMode = mSlideListView.getSlideAdapter()
+					.getSlideModeInPosition(position - mSlideListView.getHeaderViewsCount());
 			if (rightBackView != null && (slideMode == SlideMode.RIGHT || slideMode == SlideMode.BOTH)) {
 				minOffset = -rightBackView.getWidth();
 			} else {
@@ -219,7 +230,8 @@ public class SlideTouchListener implements OnTouchListener {
 			}
 			// don't allow swiping if this is on the header or footer or
 			// IGNORE_ITEM_VIEW_TYPE or enabled is false on the adapter
-			boolean allowSlide = mSlideListView.getAdapter().isEnabled(position) && mSlideListView.getAdapter().getItemViewType(position) >= 0;
+			boolean allowSlide = mSlideListView.getAdapter().isEnabled(position)
+					&& mSlideListView.getAdapter().getItemViewType(position) >= 0;
 			if (allowSlide) {
 				// below or equals 3.0,the OnScrollListener callback has
 				// error,so we need check the ListView scroll state
@@ -363,21 +375,23 @@ public class SlideTouchListener implements OnTouchListener {
 				 * Don't need automatic sliding, has already reached a fixed
 				 * position
 				 */
-				if (mSlideItem.offset == 0 || mSlideItem.offset == mSlideItem.minOffset || mSlideItem.offset == mSlideItem.maxOffset) {
+				if (mSlideItem.offset == 0 || mSlideItem.offset == mSlideItem.minOffset
+						|| mSlideItem.offset == mSlideItem.maxOffset) {
 					slidingFinish();
 					return true;
 				}
 
-				SlideMode slideMode = mSlideListView.getSlideAdapter().getSlideModeInPosition(
-						mSlideItem.position - mSlideListView.getHeaderViewsCount());
+				SlideMode slideMode = mSlideListView.getSlideAdapter()
+						.getSlideModeInPosition(mSlideItem.position - mSlideListView.getHeaderViewsCount());
 				boolean doOpen = false;// open or close
 				if (mSlideItem.offset > 0) {// left back view is showing
 					if (slideMode == SlideMode.LEFT || slideMode == SlideMode.BOTH) {// SlideMode
 																						// support
 																						// left
 						// the move distance greater than leftBackView's width/4
-						boolean distanceGreater = Math.abs(mSlideItem.offset - mSlideItem.previousOffset) > Math.abs(mSlideItem.maxOffset)
-								/ (float) 4;
+						boolean distanceGreater = Math
+								.abs(mSlideItem.offset - mSlideItem.previousOffset) > Math.abs(mSlideItem.maxOffset)
+										/ (float) 4;
 						if (mSlideItem.offset - mSlideItem.previousOffset > 0) {
 							doOpen = distanceGreater;
 						} else {
@@ -390,8 +404,9 @@ public class SlideTouchListener implements OnTouchListener {
 																						// right
 						// the move distance greater than rightBackView's
 						// width/4
-						boolean distanceGreater = Math.abs(mSlideItem.offset - mSlideItem.previousOffset) > Math.abs(mSlideItem.minOffset)
-								/ (float) 4;
+						boolean distanceGreater = Math
+								.abs(mSlideItem.offset - mSlideItem.previousOffset) > Math.abs(mSlideItem.minOffset)
+										/ (float) 4;
 						if (mSlideItem.offset - mSlideItem.previousOffset > 0) {
 							doOpen = !distanceGreater;
 						} else {
@@ -462,7 +477,8 @@ public class SlideTouchListener implements OnTouchListener {
 		}
 	}
 
-	private void autoScroll(final int offset, final boolean toOpen) {
+	public void autoScroll(final int offset, final boolean toOpen) {
+
 		mScrollState = SLIDING_STATE_AUTO;
 		int moveTo = 0;
 		if (offset < 0) {// right back view is showing
@@ -483,44 +499,48 @@ public class SlideTouchListener implements OnTouchListener {
 			}
 		}
 
-		animate(mSlideItem.frontView).translationX(moveTo).setDuration(getAnimationTime()).setListener(new AnimatorListenerAdapter() {
-			@Override
-			public void onAnimationEnd(Animator animation) {
-				// In some extreme cases,the mSlideItem will be null when the
-				// animation end.
-				// For example,when the item is in sliding or auto sliding,you
-				// set a new Adapter to the listview.etc.
-				// So,add this judgment to avoid NullPointerException
-				if (mSlideItem == null) {
-					if (SlideListView.DEUBG) {
-						Log.d(SlideListView.TAG, "NullPointerException(onAnimationEnd,mSlideItem has been reset)");
+		animate(mSlideItem.frontView).translationX(moveTo).setDuration(getAnimationTime())
+				.setListener(new AnimatorListenerAdapter() {
+					@Override
+					public void onAnimationEnd(Animator animation) {
+						// In some extreme cases,the mSlideItem will be null
+						// when the
+						// animation end.
+						// For example,when the item is in sliding or auto
+						// sliding,you
+						// set a new Adapter to the listview.etc.
+						// So,add this judgment to avoid NullPointerException
+						if (mSlideItem == null) {
+							if (SlideListView.DEUBG) {
+								Log.d(SlideListView.TAG,
+										"NullPointerException(onAnimationEnd,mSlideItem has been reset)");
+							}
+							return;
+						}
+						if (toOpen) {// to open
+							if (offset < 0) {// right back view is opend
+								mSlideItem.offset = mSlideItem.minOffset;
+							} else {// left back view is opend
+								mSlideItem.offset = mSlideItem.maxOffset;
+							}
+						} else {// to close
+							mSlideItem.offset = 0;
+						}
+						slidingFinish();
 					}
-					return;
-				}
-				if (toOpen) {// to open
-					if (offset < 0) {// right back view is opend
-						mSlideItem.offset = mSlideItem.minOffset;
-					} else {// left back view is opend
-						mSlideItem.offset = mSlideItem.maxOffset;
-					}
-				} else {// to close
-					mSlideItem.offset = 0;
-				}
-				slidingFinish();
-			}
-		});
+				});
 
 	}
 
 	private void move(int offset) {
-		setTranslationX(mSlideItem.frontView,  offset - mSlideItem.gingerbread_mr1_Offset);
+		setTranslationX(mSlideItem.frontView, offset - mSlideItem.gingerbread_mr1_Offset);
 		if (offset < 0) {// offset less than 0,right back view is showing and
 							// left dismiss
 			if (mSlideItem.rightBackView != null) {
 				mSlideItem.child.setRightBackViewShow(true);
 				SlideAction rightAction = mSlideListView.getSlideRightAction();
 				if (rightAction == SlideAction.SCROLL) {
-					setTranslationX(mSlideItem.rightBackView,  offset - mSlideItem.gingerbread_mr1_Offset);
+					setTranslationX(mSlideItem.rightBackView, offset - mSlideItem.gingerbread_mr1_Offset);
 				}
 			}
 			if (mSlideItem.leftBackView != null) {
@@ -532,7 +552,7 @@ public class SlideTouchListener implements OnTouchListener {
 				mSlideItem.child.setLeftBackViewShow(true);
 				SlideAction leftAction = mSlideListView.getSlideLeftAction();
 				if (leftAction == SlideAction.SCROLL) {
-					setTranslationX(mSlideItem.leftBackView,  offset - mSlideItem.gingerbread_mr1_Offset);
+					setTranslationX(mSlideItem.leftBackView, offset - mSlideItem.gingerbread_mr1_Offset);
 				}
 			}
 			if (mSlideItem.rightBackView != null) {

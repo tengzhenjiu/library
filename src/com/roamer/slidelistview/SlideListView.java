@@ -18,6 +18,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import com.example.swiplistview.R;
+import com.roamer.slidelistview.SlideTouchListener.SlideItem;
 
 public class SlideListView extends ListView {
 	public static final boolean DEUBG = true;
@@ -62,7 +63,7 @@ public class SlideListView extends ListView {
 		super(context, attrs, defStyle);
 		init(attrs);
 	}
-	
+
 	@Override
 	public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		int expandSpec = MeasureSpec.makeMeasureSpec(Integer.MAX_VALUE >> 2, MeasureSpec.AT_MOST);
@@ -80,8 +81,10 @@ public class SlideListView extends ListView {
 			TypedArray styled = getContext().obtainStyledAttributes(attrs, R.styleable.SlideListView);
 			mAnimationTime = styled.getInteger(R.styleable.SlideListView_slideAnimationTime, 0);
 			mSlideMode = SlideMode.mapIntToValue(styled.getInteger(R.styleable.SlideListView_slideMode, 0));
-			mSlideLeftAction = SlideAction.mapIntToValue(styled.getInteger(R.styleable.SlideListView_slideLeftAction, 0));
-			mSlideRightAction = SlideAction.mapIntToValue(styled.getInteger(R.styleable.SlideListView_slideRightAction, 0));
+			mSlideLeftAction = SlideAction
+					.mapIntToValue(styled.getInteger(R.styleable.SlideListView_slideLeftAction, 0));
+			mSlideRightAction = SlideAction
+					.mapIntToValue(styled.getInteger(R.styleable.SlideListView_slideRightAction, 0));
 			styled.recycle();
 		}
 		mTouchListener = new SlideTouchListener(this);
@@ -90,7 +93,7 @@ public class SlideListView extends ListView {
 		// You can use setOnScrollListener() in your own code
 		setOnScrollListener(mInnerOnScrollListener);
 		// You can use setOnItemClickListener() in your own code
-		//setOnItemClickListener(mInnerOnItemClickListener);
+		setOnItemClickListener(mInnerOnItemClickListener);
 	}
 
 	@Override
@@ -136,13 +139,16 @@ public class SlideListView extends ListView {
 
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-			if (mTouchListener.isOpend()) {
-				mTouchListener.closeOpenedItem();
-				return;
-			}
-			if (mOnItemClickListener != null) {
-				mOnItemClickListener.onItemClick(parent, view, position, id);
-			}
+			/*
+			 * if (mTouchListener.isOpend()) { mTouchListener.closeOpenedItem();
+			 * return; }
+			 */
+			/*
+			 * if (mOnItemClickListener != null) {
+			 * mOnItemClickListener.onItemClick(parent, view, position, id); }
+			 */
+			mTouchListener.CreatItem(position);
+			mTouchListener.autoScroll(mTouchListener.mSlideItem.offset, true);
 		}
 	};
 
@@ -443,6 +449,5 @@ public class SlideListView extends ListView {
 		}
 
 	}
-	
-	
+
 }

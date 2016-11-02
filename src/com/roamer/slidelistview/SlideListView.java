@@ -17,8 +17,11 @@ import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
+import static com.nineoldandroids.view.ViewHelper.setTranslationX;
+import static com.nineoldandroids.view.ViewPropertyAnimator.animate;
 import com.example.swiplistview.R;
 import com.roamer.slidelistview.SlideTouchListener.SlideItem;
+import com.roamer.slidelistview.wrap.SlideItemWrapLayout;
 
 public class SlideListView extends ListView {
 	public static final boolean DEUBG = true;
@@ -137,18 +140,25 @@ public class SlideListView extends ListView {
 
 	private AdapterView.OnItemClickListener mInnerOnItemClickListener = new OnItemClickListener() {
 
+		private int minOffset;
+
 		@Override
 		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-			/*
-			 * if (mTouchListener.isOpend()) { mTouchListener.closeOpenedItem();
-			 * return; }
-			 */
-			/*
-			 * if (mOnItemClickListener != null) {
-			 * mOnItemClickListener.onItemClick(parent, view, position, id); }
-			 */
+
+			if (mTouchListener.isOpend()) {
+				mTouchListener.closeOpenedItem();
+				return;
+			}
+
 			mTouchListener.CreatItem(position);
-			mTouchListener.autoScroll(mTouchListener.mSlideItem.offset, true);
+
+			View rightBackView = ((SlideItemWrapLayout) SlideListView.this
+					.getChildAt(position - SlideListView.this.getFirstVisiblePosition())).getRightBackView();
+
+			minOffset = -rightBackView.getWidth();
+			System.out.println(minOffset + "");
+			//rightBackView.animate().translationX(-100).setDuration(getAnimationTime());
+			mTouchListener.autoScroll(minOffset, true);
 		}
 	};
 

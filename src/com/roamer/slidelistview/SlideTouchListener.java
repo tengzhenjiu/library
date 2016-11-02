@@ -478,7 +478,7 @@ public class SlideTouchListener implements OnTouchListener {
 	}
 
 	public void autoScroll(final int offset, final boolean toOpen) {
-
+		mSlideItem.child.setRightBackViewShow(true);
 		mScrollState = SLIDING_STATE_AUTO;
 		int moveTo = 0;
 		if (offset < 0) {// right back view is showing
@@ -498,7 +498,6 @@ public class SlideTouchListener implements OnTouchListener {
 				animate(mSlideItem.leftBackView).translationX(moveTo).setDuration(getAnimationTime());
 			}
 		}
-
 		animate(mSlideItem.frontView).translationX(moveTo).setDuration(getAnimationTime())
 				.setListener(new AnimatorListenerAdapter() {
 					@Override
